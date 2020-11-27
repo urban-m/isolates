@@ -1,0 +1,61 @@
+---
+title: Wilcoxon-Mann-Whitney Test
+author: "Matthias Urban"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document: default
+---
+# Overview
+
+This document describes the procedurs for carrying out the Wilcoxon-Mann-Whitney Test reported in the article.
+
+# Required packages
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+# Data preparation
+
+Load in datasets
+```{r}
+languagesonlandmasswithmountains <- read.csv("../Data/languagesonlandmasswithmountains.csv", header = T, encoding = "UTF-8")
+languagesonlandmasswithhighmountains <- read.csv("../Data/languagesonlandmasswithhighmountains.csv", header = T, encoding = "UTF-8")
+```
+Treat Macroareas as factors
+```{r}
+languagesonlandmasswithmountains$Macroarea <- as.factor(languagesonlandmasswithmountains$Macroarea)
+languagesonlandmasswithhighmountains$Macroarea <- as.factor(languagesonlandmasswithhighmountains$Macroarea)
+```
+
+# Main test
+```{r}
+isolatesnarrowonlandmasswithhighmountains <- languagesonlandmasswithhighmountains %>% filter(IsolateNarrow == T)
+nonisolatesnarrowonlandmasswithhighmountains <- languagesonlandmasswithhighmountains %>% filter(IsolateNarrow == F)
+wilcox.test(isolatesnarrowonlandmasswithhighmountains$Distancetosea, nonisolatesnarrowonlandmasswithhighmountains$Distancetosea, alternative = "less")
+wilcox.test(isolatesnarrowonlandmasswithhighmountains$Distancetohighmountain, nonisolatesnarrowonlandmasswithhighmountains$Distancetohighmountain, alternative = "less")
+```
+
+# Ancillary test: High Mountain areas, Isolates Wide
+```{r}
+isolateswideonlandmasswithhighmountains <- languagesonlandmasswithhighmountains %>% filter(IsolateWide == T)
+nonisolateswideonlandmasswithhighmountains <- languagesonlandmasswithhighmountains %>% filter(IsolateWide == F)
+wilcox.test(isolateswideonlandmasswithhighmountains$Distancetosea, nonisolateswideonlandmasswithhighmountains$Distancetosea, alternative = "less")
+wilcox.test(isolateswideonlandmasswithhighmountains$Distancetohighmountain, nonisolateswideonlandmasswithhighmountains$Distancetohighmountain, alternative = "less")
+```
+
+# Ancillary test: All mountainareas, Isolates Narrow
+```{r}
+isolatesnarrowonlandmasswithmountains <- languagesonlandmasswithmountains %>% filter(IsolateNarrow == T)
+nonisolatesnarrowonlandmasswithmountains <- languagesonlandmasswithmountains %>% filter(IsolateNarrow == F)
+wilcox.test(isolatesnarrowonlandmasswithmountains$Distancetosea, nonisolatesnarrowonlandmasswithmountains$Distancetosea, alternative = "less")
+wilcox.test(isolatesnarrowonlandmasswithmountains$Distancetomountain, nonisolatesnarrowonlandmasswithmountains$Distancetomountain, alternative = "less")
+```
+
+# Ancillary test: All  Mountain areas, Isolates Wide
+```{r}
+isolateswideonlandmasswithmountains <- languagesonlandmasswithmountains %>% filter(IsolateWide == T)
+nonisolateswideonlandmasswithmountains <- languagesonlandmasswithmountains %>% filter(IsolateWide == F)
+wilcox.test(isolateswideonlandmasswithmountains$Distancetosea, nonisolateswideonlandmasswithmountains$Distancetosea, alternative = "less")
+wilcox.test(isolateswideonlandmasswithmountains$Distancetomountain, nonisolateswideonlandmasswithmountains$Distancetomountain, alternative = "less")
+```
