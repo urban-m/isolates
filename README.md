@@ -8,5 +8,5 @@ The repository contains the following folders:
 * [Creating maps for case studies](Creating%20maps%20for%20case%20studies): code to generate geographic maps for the case studies on isolate and family range reductions
 * [Data](Data): data used in the analyses
 * [Data preparation and selection](Data%20preparation%20and%20selection): pre-processing and subsetting scripts, creating the datasets used for analyses
-* [Statistical analyes](Statistical%20analyes): script for carrying out the statistical procedures on the datasets
+* [Statistical analyes](Statistical%20analyes): scripts for carrying out the statistical procedures on the datasets
 * [Supplemenary Information S1](Supplemenary%20Information%20S1): Table with results of ancillary analyses as created in the scripts in folder "Statistical analyses" for easy accessibility
