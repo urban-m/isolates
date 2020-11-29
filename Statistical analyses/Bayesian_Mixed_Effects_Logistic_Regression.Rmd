@@ -1,0 +1,171 @@
+---
+title: Statistical analyses
+author: "Matthias Urban"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document: default
+---
+# Overview
+
+This document describes the procedures for fitting, running, and assessing the Bayesian Mixed Effects Logistic Regression Models.
+
+# Required packages
+
+```{r message=FALSE}
+library(tidyverse)
+require(brms)
+```
+
+# Data preparation
+
+Load in datasets
+```{r}
+languagesonlandmasswithmountains <- read.csv("../Data/languagesonlandmasswithmountains.csv", header = T, encoding = "UTF-8")
+languagesonlandmasswithhighmountains <- read.csv("../Data/languagesonlandmasswithhighmountains.csv", header = T, encoding = "UTF-8")
+```
+Treat Macroareas as factors
+```{r}
+languagesonlandmasswithmountains$Macroarea <- as.factor(languagesonlandmasswithmountains$Macroarea)
+languagesonlandmasswithhighmountains$Macroarea <- as.factor(languagesonlandmasswithhighmountains$Macroarea)
+```
+
+Log 10 transform of predictors after adding a constant to reduce skew
+```{r, cache=TRUE}
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Family_ID = ifelse(Family_ID == "", Name, Family_ID))
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Distancetosealog10 = log10(Distancetosea + 0.001))
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Distancetomountainlog10 = log10(Distancetomountain + 0.001))
+
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Family_ID = ifelse(Family_ID == "", Name, Family_ID))
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetosealog10 = log10(Distancetosea + 0.001))
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetohighmountainlog10 = log10(Distancetohighmountain + 0.001))
+```
+
+Set area for the five New Zealand languages in the dataset (the only ones remaining for the Papunesia area) to NA 
+```{r}
+languagesonlandmasswithhighmountains[which(languagesonlandmasswithhighmountains$Macroarea == "Papunesia"), "Macroarea"] <- NA
+languagesonlandmasswithhighmountainsmodeling <- drop_na(languagesonlandmasswithhighmountains, Macroarea)
+```
+
+Set priors
+```{r, cache=TRUE}
+priorshighmountains <- set_prior("normal(0, 2)", class = "b", coef = c("Distancetosealog10", "Distancetohighmountainlog10"))
+priorsmountains <- set_prior("normal(0, 2)", class = "b", coef = c("Distancetosealog10", "Distancetomountainlog10"))
+```
+
+# Main analysis
+```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
+isolatesnarrowhighmountainslog10model <- brm(IsolateNarrow ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithhighmountainsmodeling, warmup = 2000, iter = 3000, chains = 4, prior = priorshighmountains, seed = 68, control = list(adapt_delta = 0.999999, max_treedepth = 20))
+```
+
+Model assessment and checks
+
+check Rhat and ESS values
+```{r}
+summary(isolatesnarrowhighmountainslog10model)
+```
+Inspect chains
+```{r}
+plot(isolatesnarrowhighmountainslog10model)
+```
+Inspect plots of observed data and posterior predictive samples
+```{r}
+pp_check(isolatesnarrowhighmountainslog10model)
+pp_check(isolatesnarrowhighmountainslog10model, type = "error_binned")
+```
+Assess predictive accuracy
+```{r, cache=TRUE}
+isolatesnarrowhighmountainslog10model_pred <- predict(isolatesnarrowhighmountainslog10model, type = "response")[, "Estimate"]
+isolatesnarrowhighmountainslog10model_pred <- as.numeric(isolatesnarrowhighmountainslog10model_pred > mean(languagesonlandmasswithhighmountainsmodeling$IsolateNarrow))
+```
+```{r, cache=TRUE}
+(classtab_isolatesnarrowhighmountainslog10model <- table(predicted = isolatesnarrowhighmountainslog10model_pred, observed = languagesonlandmasswithhighmountainsmodeling$IsolateNarrow))
+(acc_isolatesnarrowhighmountainslog10model <- sum(diag(classtab_isolatesnarrowhighmountainslog10model)) / sum(classtab_isolatesnarrowhighmountainslog10model))
+```
+
+# Ancillary analyses
+
+## Bernoulli model for isolates in a wide sense and highmountainareas with log10 transformed predictors and random effect for macroarea
+```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
+isolateswidehighmountainslog10model <- brm(IsolateWide ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithhighmountainsmodeling, warmup = 2000, iter = 3000, chains = 4, prior = priorshighmountains, seed = 2102, control = list(adapt_delta = 0.999999, max_treedepth = 20))
+```
+
+Model assessment and checks
+
+check Rhat and ESS values
+```{r}
+summary(isolateswidehighmountainslog10model)
+```
+Inspect chains
+```{r}
+plot(isolateswidehighmountainslog10model)
+```
+Inspect plots of observed data and posterior predictive samples
+```{r}
+pp_check(isolateswidehighmountainslog10model)
+pp_check(isolateswidehighmountainslog10model, type = "error_binned")
+```
+Assess predictive accuracy
+```{r, cache=TRUE}
+isolateswidehighmountainslog10model_pred <- predict(isolateswidehighmountainslog10model, type = "response")[, "Estimate"]
+isolateswidehighmountainslog10model_pred <- as.numeric(isolateswidehighmountainslog10model_pred > mean(languagesonlandmasswithhighmountainsmodeling$IsolateWide))
+```
+```{r, cache=TRUE}
+(classtab_isolateswidehighmountainslog10model <- table(predicted = isolateswidehighmountainslog10model_pred, observed = languagesonlandmasswithhighmountainsmodeling$IsolateWide))
+(acc_isolateswidehighmountainslog10model <- sum(diag(classtab_isolateswidehighmountainslog10model)) / sum(classtab_isolateswidehighmountainslog10model))
+```
+
+## Bernoulli model for isolates in a narrow sense and all mountainareas with log10 transformed predictors and random effect for macroarea
+```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
+isolatesnarrowallmountainslog10model <- brm(IsolateNarrow ~ Distancetosealog10 * Distancetomountainlog10 + (1 + (Distancetosealog10 * Distancetomountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithmountains, warmup = 2000, iter = 3000, chains = 4, prior = priorsmountains, seed = 2102, control = list(adapt_delta = 0.999999, max_treedepth = 20))
+```
+
+Model assessment and checks
+
+check Rhat and ESS values
+```{r}
+summary(isolatesnarrowallmountainslog10model)
+```
+Inspect chains
+```{r}
+plot(isolatesnarrowallmountainslog10model)
+```
+Inspect plots of observed data and posterior predictive samples
+```{r}
+pp_check(isolatesnarrowallmountainslog10model)
+pp_check(isolatesnarrowallmountainslog10model, type = "error_binned")
+```
+Assess predictive accuracy
+```{r, cache=TRUE}
+isolatesnarrowallmountainslog10model_pred <- predict(isolatesnarrowallmountainslog10model, type = "response")[, "Estimate"]
+isolatesnarrowallmountainslog10model_pred <- as.numeric(isolatesnarrowallmountainslog10model_pred > mean(languagesonlandmasswithmountains$IsolateNarrow))
+```
+```{r, cache=TRUE}
+(classtab_isolatesnarrowallmountainslog10model <- table(predicted = isolatesnarrowallmountainslog10model_pred, observed = languagesonlandmasswithmountains$IsolateNarrow))
+(acc_isolatesnarrowallmountainslog10model <- sum(diag(classtab_isolatesnarrowallmountainslog10model)) / sum(classtab_isolatesnarrowallmountainslog10model))
+```
+
+## Bernoulli model for isolates in a wide sense and all mountainareas with log10 transformed predictors and random effect for macroarea
+```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
+isolatewideallmountainslog10model <- brm(IsolateWide ~ Distancetosealog10 * Distancetomountainlog10 + (1 + (Distancetosealog10 * Distancetomountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithmountains, warmup = 2000, iter = 3000, chains = 4, prior = priorsmountains, seed = 2102, control = list(adapt_delta = 0.999999, max_treedepth = 20))
+```
+check Rhat and ESS values
+```{r}
+summary(isolatewideallmountainslog10model)
+```
+Inspect chains
+```{r}
+plot(isolatewideallmountainslog10model)
+```
+Inspect plots of observed data and posterior predictive samples
+```{r}
+pp_check(isolatewideallmountainslog10model)
+pp_check(isolatewideallmountainslog10model, type = "error_binned")
+```
+```{r, cache=TRUE}
+isolatewideallmountainslog10model_pred <- predict(isolatewideallmountainslog10model, type = "response")[, "Estimate"]
+isolatewideallmountainslog10model_pred <- as.numeric(isolatewideallmountainslog10model_pred > mean(languagesonlandmasswithmountains$IsolateWide))
+```
+```{r, cache=TRUE}
+(classtab_isolatewideallmountainslog10model <- table(predicted = isolatewideallmountainslog10model_pred, observed = languagesonlandmasswithmountains$IsolateWide))
+(acc_isolatewideallmountainslog10model <- sum(diag(classtab_isolatewideallmountainslog10model)) / sum(classtab_isolatewideallmountainslog10model))
+```
