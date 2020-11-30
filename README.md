@@ -9,4 +9,4 @@ The repository contains the following folders:
 * [Data](Data): data used in the analyses
 * [Data preparation and selection](Data%20preparation%20and%20selection): pre-processing and subsetting scripts, creating the datasets used for analyses
 * [Statistical analyses](Statistical%20analyses): scripts for carrying out the statistical procedures on the datasets
-* [Supplemenary Information](Supplemenary%20Information%20): Table with results of ancillary analyses as created in the scripts in folder "Statistical analyses" for easy accessibility
+* [Supplementary Information](Supplementary%20Information%20): Tables with additional descriptive statistics and ancillary analyses for larger datasets than that used for the main analysis as created in the scripts in folder "Statistical analyses" for easy accessibility
