@@ -1,7 +1,7 @@
 Statistical analyses
 ================
 Matthias Urban
-29 November, 2020
+13 März, 2021
 
 # Overview
 
@@ -43,19 +43,19 @@ languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmounta
 languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetohighmountainlog10 = log10(Distancetohighmountain + 0.001))
 ```
 
-Set area for the five New Zealand languages in the dataset (the only
-ones remaining for the Papunesia area) to NA
-
-``` r
-languagesonlandmasswithhighmountains[which(languagesonlandmasswithhighmountains$Macroarea == "Papunesia"), "Macroarea"] <- NA
-languagesonlandmasswithhighmountainsmodeling <- drop_na(languagesonlandmasswithhighmountains, Macroarea)
-```
-
 Set priors
 
 ``` r
 priorshighmountains <- set_prior("normal(0, 2)", class = "b", coef = c("Distancetosealog10", "Distancetohighmountainlog10"))
 priorsmountains <- set_prior("normal(0, 2)", class = "b", coef = c("Distancetosealog10", "Distancetomountainlog10"))
+```
+
+Then we set the area for the five New Zealand languages in the dataset
+(the only ones remaining for the Papunesia area) to NA
+
+``` r
+languagesonlandmasswithhighmountains[which(languagesonlandmasswithhighmountains$Macroarea == "Papunesia"), "Macroarea"] <- NA
+languagesonlandmasswithhighmountainsmodeling <- drop_na(languagesonlandmasswithhighmountains, Macroarea)
 ```
 
 # Main analysis
@@ -223,7 +223,7 @@ isolatesnarrowhighmountainslog10model_pred <- as.numeric(isolatesnarrowhighmount
 
 # Ancillary analyses
 
-## Bernoulli model for isolates in a wide sense and highmountainareas with log10 transformed predictors and random effect for macroarea
+## Bernoulli model for isolates in a wide sense and high mountain areas with log10 transformed predictors and random effect for macroarea
 
 ``` r
 isolateswidehighmountainslog10model <- brm(IsolateWide ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithhighmountainsmodeling, warmup = 2000, iter = 3000, chains = 4, prior = priorshighmountains, seed = 2102, control = list(adapt_delta = 0.999999, max_treedepth = 20))
@@ -708,3 +708,193 @@ isolatewideallmountainslog10model_pred <- as.numeric(isolatewideallmountainslog1
 ```
 
     ## [1] 0.7482085
+
+## Finally, we run a model with the specifications as in the main analysis (i.e. isolates in a narrow sense and high mountain areas with log10 transformed predictors and random effect for macroarea), but this time retaining the “Papunesia” macro-area as a level in the random effects structure
+
+Load in datasets again
+
+``` r
+languagesonlandmasswithmountains <- read.csv("../Data/languagesonlandmasswithmountains.csv", header = T, encoding = "UTF-8")
+languagesonlandmasswithhighmountains <- read.csv("../Data/languagesonlandmasswithhighmountains.csv", header = T, encoding = "UTF-8")
+```
+
+Treat Macroareas as factors again
+
+``` r
+languagesonlandmasswithmountains$Macroarea <- as.factor(languagesonlandmasswithmountains$Macroarea)
+languagesonlandmasswithhighmountains$Macroarea <- as.factor(languagesonlandmasswithhighmountains$Macroarea)
+```
+
+Log 10 transform of predictors after adding a constant to reduce skew
+again
+
+``` r
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Family_ID = ifelse(Family_ID == "", Name, Family_ID))
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Distancetosealog10 = log10(Distancetosea + 0.001))
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Distancetomountainlog10 = log10(Distancetomountain + 0.001))
+
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Family_ID = ifelse(Family_ID == "", Name, Family_ID))
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetosealog10 = log10(Distancetosea + 0.001))
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetohighmountainlog10 = log10(Distancetohighmountain + 0.001))
+```
+
+``` r
+isolatesnarrowhighmountainslog10model_withpapunesia <- brm(IsolateNarrow ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithhighmountains, warmup = 2000, iter = 3000, chains = 4, prior = priorshighmountains, seed = 189, control = list(adapt_delta = 0.999999, max_treedepth = 20))
+```
+
+Model assessment and checks
+
+check Rhat and ESS values
+
+``` r
+summary(isolatesnarrowhighmountainslog10model_withpapunesia)
+```
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: IsolateNarrow ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea) 
+    ##    Data: languagesonlandmasswithhighmountains (Number of observations: 5251) 
+    ## Samples: 4 chains, each with iter = 3000; warmup = 2000; thin = 1;
+    ##          total post-warmup samples = 4000
+    ## 
+    ## Group-Level Effects: 
+    ## ~Macroarea (Number of levels: 5) 
+    ##                                                                                 Estimate
+    ## sd(Intercept)                                                                       2.06
+    ## sd(Distancetosealog10)                                                              0.57
+    ## sd(Distancetohighmountainlog10)                                                     0.37
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                                  0.13
+    ## cor(Intercept,Distancetosealog10)                                                  -0.08
+    ## cor(Intercept,Distancetohighmountainlog10)                                          0.12
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                                -0.03
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                      -0.04
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)             -0.01
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10)    -0.17
+    ##                                                                                 Est.Error
+    ## sd(Intercept)                                                                        1.23
+    ## sd(Distancetosealog10)                                                               0.55
+    ## sd(Distancetohighmountainlog10)                                                      0.43
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                                   0.17
+    ## cor(Intercept,Distancetosealog10)                                                    0.44
+    ## cor(Intercept,Distancetohighmountainlog10)                                           0.43
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                                  0.46
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                        0.44
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)               0.46
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10)      0.46
+    ##                                                                                 l-95% CI
+    ## sd(Intercept)                                                                       0.39
+    ## sd(Distancetosealog10)                                                              0.02
+    ## sd(Distancetohighmountainlog10)                                                     0.01
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                                  0.00
+    ## cor(Intercept,Distancetosealog10)                                                  -0.83
+    ## cor(Intercept,Distancetohighmountainlog10)                                         -0.72
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                                -0.85
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                      -0.81
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)             -0.83
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10)    -0.91
+    ##                                                                                 u-95% CI
+    ## sd(Intercept)                                                                       5.07
+    ## sd(Distancetosealog10)                                                              2.08
+    ## sd(Distancetohighmountainlog10)                                                     1.58
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                                  0.61
+    ## cor(Intercept,Distancetosealog10)                                                   0.77
+    ## cor(Intercept,Distancetohighmountainlog10)                                          0.85
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                                 0.81
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                       0.78
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)              0.83
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10)     0.72
+    ##                                                                                 Rhat
+    ## sd(Intercept)                                                                   1.00
+    ## sd(Distancetosealog10)                                                          1.00
+    ## sd(Distancetohighmountainlog10)                                                 1.00
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                              1.00
+    ## cor(Intercept,Distancetosealog10)                                               1.00
+    ## cor(Intercept,Distancetohighmountainlog10)                                      1.00
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                             1.00
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                   1.00
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)          1.00
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10) 1.00
+    ##                                                                                 Bulk_ESS
+    ## sd(Intercept)                                                                       2205
+    ## sd(Distancetosealog10)                                                              1402
+    ## sd(Distancetohighmountainlog10)                                                      985
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                                  1165
+    ## cor(Intercept,Distancetosealog10)                                                   4342
+    ## cor(Intercept,Distancetohighmountainlog10)                                          4285
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                                 3513
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                       4412
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)              4113
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10)     2931
+    ##                                                                                 Tail_ESS
+    ## sd(Intercept)                                                                       1532
+    ## sd(Distancetosealog10)                                                              1811
+    ## sd(Distancetohighmountainlog10)                                                     1750
+    ## sd(Distancetosealog10:Distancetohighmountainlog10)                                  1283
+    ## cor(Intercept,Distancetosealog10)                                                   2983
+    ## cor(Intercept,Distancetohighmountainlog10)                                          2988
+    ## cor(Distancetosealog10,Distancetohighmountainlog10)                                 3084
+    ## cor(Intercept,Distancetosealog10:Distancetohighmountainlog10)                       3083
+    ## cor(Distancetosealog10,Distancetosealog10:Distancetohighmountainlog10)              3225
+    ## cor(Distancetohighmountainlog10,Distancetosealog10:Distancetohighmountainlog10)     3004
+    ## 
+    ## Population-Level Effects: 
+    ##                                                Estimate Est.Error l-95% CI
+    ## Intercept                                         -3.17      1.24    -5.76
+    ## Distancetosealog10                                -0.02      0.44    -0.78
+    ## Distancetohighmountainlog10                       -0.15      0.30    -0.76
+    ## Distancetosealog10:Distancetohighmountainlog10     0.04      0.13    -0.18
+    ##                                                u-95% CI Rhat Bulk_ESS Tail_ESS
+    ## Intercept                                         -0.66 1.00     2098     2332
+    ## Distancetosealog10                                 1.01 1.00     1861     1520
+    ## Distancetohighmountainlog10                        0.42 1.00     1948     1606
+    ## Distancetosealog10:Distancetohighmountainlog10     0.32 1.00     1786     1004
+    ## 
+    ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+    ## and Tail_ESS are effective sample size measures, and Rhat is the potential
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
+
+Inspect chains
+
+``` r
+plot(isolatesnarrowhighmountainslog10model_withpapunesia)
+```
+
+![](Bayesian_Mixed_Effects_Logistic_Regression_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->![](Bayesian_Mixed_Effects_Logistic_Regression_files/figure-gfm/unnamed-chunk-36-2.png)<!-- -->![](Bayesian_Mixed_Effects_Logistic_Regression_files/figure-gfm/unnamed-chunk-36-3.png)<!-- -->
+Inspect plots of observed data and posterior predictive samples
+
+``` r
+pp_check(isolatesnarrowhighmountainslog10model_withpapunesia)
+```
+
+    ## Using 10 posterior samples for ppc type 'dens_overlay' by default.
+
+![](Bayesian_Mixed_Effects_Logistic_Regression_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+
+``` r
+pp_check(isolatesnarrowhighmountainslog10model_withpapunesia, type = "error_binned")
+```
+
+    ## Using 10 posterior samples for ppc type 'error_binned' by default.
+
+![](Bayesian_Mixed_Effects_Logistic_Regression_files/figure-gfm/unnamed-chunk-37-2.png)<!-- -->
+Assess predictive accuracy
+
+``` r
+isolatesnarrowhighmountainslog10model_withpapunesia_pred <- predict(isolatesnarrowhighmountainslog10model_withpapunesia, type = "response")[, "Estimate"]
+isolatesnarrowhighmountainslog10model_withpapunesia_pred <- as.numeric(isolatesnarrowhighmountainslog10model_withpapunesia_pred > mean(languagesonlandmasswithhighmountains$IsolateNarrow))
+```
+
+``` r
+(classtab_isolatesnarrowhighmountainslog10model_withpapunesia <- table(predicted = isolatesnarrowhighmountainslog10model_withpapunesia_pred, observed = languagesonlandmasswithhighmountains$IsolateNarrow))
+```
+
+    ##          observed
+    ## predicted FALSE TRUE
+    ##         0  3911   27
+    ##         1  1219   94
+
+``` r
+(acc_isolatesnarrowhighmountainslog10model_withpapunesia <- sum(diag(classtab_isolatesnarrowhighmountainslog10model_withpapunesia)) / sum(classtab_isolatesnarrowhighmountainslog10model_withpapunesia))
+```
+
+    ## [1] 0.7627119

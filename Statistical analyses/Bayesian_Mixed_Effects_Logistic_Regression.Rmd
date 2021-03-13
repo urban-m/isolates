@@ -40,17 +40,19 @@ languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmounta
 languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetohighmountainlog10 = log10(Distancetohighmountain + 0.001))
 ```
 
-Set area for the five New Zealand languages in the dataset (the only ones remaining for the Papunesia area) to NA 
-```{r}
-languagesonlandmasswithhighmountains[which(languagesonlandmasswithhighmountains$Macroarea == "Papunesia"), "Macroarea"] <- NA
-languagesonlandmasswithhighmountainsmodeling <- drop_na(languagesonlandmasswithhighmountains, Macroarea)
-```
-
 Set priors
 ```{r, cache=TRUE}
 priorshighmountains <- set_prior("normal(0, 2)", class = "b", coef = c("Distancetosealog10", "Distancetohighmountainlog10"))
 priorsmountains <- set_prior("normal(0, 2)", class = "b", coef = c("Distancetosealog10", "Distancetomountainlog10"))
 ```
+
+Then we set the area for the five New Zealand languages in the dataset (the only ones remaining for the Papunesia area) to NA 
+```{r}
+languagesonlandmasswithhighmountains[which(languagesonlandmasswithhighmountains$Macroarea == "Papunesia"), "Macroarea"] <- NA
+languagesonlandmasswithhighmountainsmodeling <- drop_na(languagesonlandmasswithhighmountains, Macroarea)
+```
+
+
 
 # Main analysis
 ```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
@@ -84,7 +86,7 @@ isolatesnarrowhighmountainslog10model_pred <- as.numeric(isolatesnarrowhighmount
 
 # Ancillary analyses
 
-## Bernoulli model for isolates in a wide sense and highmountainareas with log10 transformed predictors and random effect for macroarea
+## Bernoulli model for isolates in a wide sense and high mountain areas with log10 transformed predictors and random effect for macroarea
 ```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
 isolateswidehighmountainslog10model <- brm(IsolateWide ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithhighmountainsmodeling, warmup = 2000, iter = 3000, chains = 4, prior = priorshighmountains, seed = 2102, control = list(adapt_delta = 0.999999, max_treedepth = 20))
 ```
@@ -168,4 +170,57 @@ isolatewideallmountainslog10model_pred <- as.numeric(isolatewideallmountainslog1
 ```{r, cache=TRUE}
 (classtab_isolatewideallmountainslog10model <- table(predicted = isolatewideallmountainslog10model_pred, observed = languagesonlandmasswithmountains$IsolateWide))
 (acc_isolatewideallmountainslog10model <- sum(diag(classtab_isolatewideallmountainslog10model)) / sum(classtab_isolatewideallmountainslog10model))
+```
+
+## Finally, we run a  model with the specifications as in the main analysis (i.e. isolates in a narrow sense and high mountain areas with log10 transformed predictors and random effect for macroarea), but this time retaining the "Papunesia" macro-area as a level in the random effects structure
+
+Load in datasets again
+```{r}
+languagesonlandmasswithmountains <- read.csv("../Data/languagesonlandmasswithmountains.csv", header = T, encoding = "UTF-8")
+languagesonlandmasswithhighmountains <- read.csv("../Data/languagesonlandmasswithhighmountains.csv", header = T, encoding = "UTF-8")
+```
+Treat Macroareas as factors again
+```{r}
+languagesonlandmasswithmountains$Macroarea <- as.factor(languagesonlandmasswithmountains$Macroarea)
+languagesonlandmasswithhighmountains$Macroarea <- as.factor(languagesonlandmasswithhighmountains$Macroarea)
+```
+
+Log 10 transform of predictors after adding a constant to reduce skew again
+```{r, cache=TRUE}
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Family_ID = ifelse(Family_ID == "", Name, Family_ID))
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Distancetosealog10 = log10(Distancetosea + 0.001))
+languagesonlandmasswithmountains <- mutate(languagesonlandmasswithmountains, Distancetomountainlog10 = log10(Distancetomountain + 0.001))
+
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Family_ID = ifelse(Family_ID == "", Name, Family_ID))
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetosealog10 = log10(Distancetosea + 0.001))
+languagesonlandmasswithhighmountains <- mutate(languagesonlandmasswithhighmountains, Distancetohighmountainlog10 = log10(Distancetohighmountain + 0.001))
+```
+
+```{r, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
+isolatesnarrowhighmountainslog10model_withpapunesia <- brm(IsolateNarrow ~ Distancetosealog10 * Distancetohighmountainlog10 + (1 + (Distancetosealog10 * Distancetohighmountainlog10) | Macroarea), family = "bernoulli", data = languagesonlandmasswithhighmountains, warmup = 2000, iter = 3000, chains = 4, prior = priorshighmountains, seed = 189, control = list(adapt_delta = 0.999999, max_treedepth = 20))
+```
+
+Model assessment and checks
+
+check Rhat and ESS values
+```{r}
+summary(isolatesnarrowhighmountainslog10model_withpapunesia)
+```
+Inspect chains
+```{r}
+plot(isolatesnarrowhighmountainslog10model_withpapunesia)
+```
+Inspect plots of observed data and posterior predictive samples
+```{r}
+pp_check(isolatesnarrowhighmountainslog10model_withpapunesia)
+pp_check(isolatesnarrowhighmountainslog10model_withpapunesia, type = "error_binned")
+```
+Assess predictive accuracy
+```{r, cache=TRUE}
+isolatesnarrowhighmountainslog10model_withpapunesia_pred <- predict(isolatesnarrowhighmountainslog10model_withpapunesia, type = "response")[, "Estimate"]
+isolatesnarrowhighmountainslog10model_withpapunesia_pred <- as.numeric(isolatesnarrowhighmountainslog10model_withpapunesia_pred > mean(languagesonlandmasswithhighmountains$IsolateNarrow))
+```
+```{r, cache=TRUE}
+(classtab_isolatesnarrowhighmountainslog10model_withpapunesia <- table(predicted = isolatesnarrowhighmountainslog10model_withpapunesia_pred, observed = languagesonlandmasswithhighmountains$IsolateNarrow))
+(acc_isolatesnarrowhighmountainslog10model_withpapunesia <- sum(diag(classtab_isolatesnarrowhighmountainslog10model_withpapunesia)) / sum(classtab_isolatesnarrowhighmountainslog10model_withpapunesia))
 ```
