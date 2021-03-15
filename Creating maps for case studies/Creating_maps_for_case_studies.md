@@ -1,7 +1,7 @@
 Creating maps for case studies of isolate genesis and range reduction
 ================
 Matthias Urban
-22 November, 2020
+15 März, 2021
 
 # Overview
 
@@ -69,7 +69,7 @@ ggbasque <- ggplot() +
 plot(ggbasque)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 Create inset map
 
@@ -82,7 +82,7 @@ ggbasqueinset <- ggplot() +
 plot(ggbasqueinset)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Create and save final map
 
@@ -92,10 +92,10 @@ ggbasquefull <- ggdraw(ggbasque) +
 plot(ggbasquefull)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
-ggsave("Basque map.png", plot = ggbasquefull, dpi = 600)
+ggsave("Basque map.pdf", plot = ggbasquefull, dpi = 600)
 ```
 
     ## Saving 7 x 5 in image
@@ -108,15 +108,46 @@ Read in data
 wakhi <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/wakhi.shp"))
 burushaski <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/burushaski.shp"))
 shina <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/shina.shp"))
+```
+
+    ## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS
+    ## = dumpSRS, : Discarded ellps Unknown in CRS definition: +proj=merc +lat_ts=0
+    ## +lon_0=0 +x_0=0 +y_0=0 +R=6378137 +units=m +no_defs
+
+    ## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS =
+    ## dumpSRS, : Discarded datum D_unknown in CRS definition: +proj=merc +lat_ts=0
+    ## +lon_0=0 +x_0=0 +y_0=0 +R=6378137 +units=m +no_defs
+
+    ## Warning in showSRID(wkt2, "PROJ"): Discarded ellps Unknown in CRS definition:
+    ## +proj=merc +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +R=6378137 +units=m +no_defs
+    ## +type=crs
+
+    ## Warning in showSRID(wkt2, "PROJ"): Discarded datum D_unknown in CRS definition
+
+``` r
 khowar <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/khowar.shp"))
 ```
+
+    ## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS
+    ## = dumpSRS, : Discarded ellps Unknown in CRS definition: +proj=merc +lat_ts=0
+    ## +lon_0=0 +x_0=0 +y_0=0 +R=6378137 +units=m +no_defs
+
+    ## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS =
+    ## dumpSRS, : Discarded datum D_unknown in CRS definition: +proj=merc +lat_ts=0
+    ## +lon_0=0 +x_0=0 +y_0=0 +R=6378137 +units=m +no_defs
+
+    ## Warning in showSRID(wkt2, "PROJ"): Discarded ellps Unknown in CRS definition:
+    ## +proj=merc +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +R=6378137 +units=m +no_defs
+    ## +type=crs
+
+    ## Warning in showSRID(wkt2, "PROJ"): Discarded datum D_unknown in CRS definition
 
 Create main map
 
 ``` r
 ggburushaski <- ggplot() +
   theme() +
-  geom_map(data = map.world, map = map.world, aes(map_id = region), fill = "white", colour = "black", size = 0.15) +
+  geom_map(data = map.world, map = map.world, aes(map_id = region), fill = "white", colour = "black",  size = 0.15) +
   coord_quickmap(ylim = c(34, 37), xlim = c(70, 76)) +
   geom_polygon(data = wakhi, aes(x = long, y = lat, group = id, fill = "Wakhi"), color = "black", size = 0.15) +
   geom_polygon(data = burushaski, aes(x = long, y = lat, fill = "Burushaski"), color = "black", size = 0.15) +
@@ -127,7 +158,7 @@ ggburushaski <- ggplot() +
 plot(ggburushaski)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 Create inset map
 
@@ -140,7 +171,7 @@ ggburushaskiinset <- ggplot() +
 plot(ggburushaskiinset)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 Create and save final map
 
@@ -150,10 +181,10 @@ ggburushaskifull <- ggdraw(ggburushaski) +
 plot(ggburushaskifull)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-ggsave("Burushaski map.png", plot = ggburushaskifull, dpi = 600)
+ggsave("Burushaski map.pdf", plot = ggburushaskifull, dpi = 600)
 ```
 
     ## Saving 7 x 5 in image
@@ -181,7 +212,7 @@ ggpomoan <- ggplot() +
 plot(ggpomoan)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 Create inset map
 
@@ -194,20 +225,20 @@ ggpomoaninset <- ggplot() +
 plot(ggpomoaninset)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 Create and save final map
 
 ``` r
 ggpomoanfull <- ggdraw(ggpomoan) +
-  draw_plot(ggpomoaninset, x = 0.1729, y = 0.0891, width = 0.24, height = 0.24)
+  draw_plot(ggpomoaninset, x = 0.081, y = 0.071, width = 0.24, height = 0.24)
 plot(ggpomoanfull)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
-ggsave("Pomo map.png", plot = ggpomoanfull, dpi = 600)
+ggsave("Pomo map.pdf", plot = ggpomoanfull, dpi = 600)
 ```
 
     ## Saving 7 x 5 in image
@@ -241,10 +272,10 @@ ggceltic <- ggplot() +
 plot(ggceltic)
 ```
 
-![](Creating-maps_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](Creating_maps_for_case_studies_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
-ggsave("Celtic map.png", plot = ggceltic, dpi = 600)
+ggsave("Celtic map.pdf", plot = ggceltic, dpi = 600)
 ```
 
     ## Saving 7 x 5 in image
