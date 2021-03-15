@@ -54,15 +54,19 @@ plotdataother <- languages %>%
   select(Latitude, Longitude)
 coordinates(plotdataother) <- ~ Longitude + Latitude
 proj4string(plotdataother) <- CRS("+init=epsg:4326")
+
+
 ```
 
 ### Create the map
 ```{r, message=FALSE, warning=FALSE, cache=TRUE}
+tiff(file = '../map.tiff', width=2684, height=2208)
 map <- openmap(c(80, -180), c(-80, 180), type = "nps", minNumTiles = 100)
 plot(map)
-points(spTransform(plotdataother, osm()), pch = 21, col = "black", bg = "white", cex = 0.6)
-points(spTransform(plotdataisolatesnarrow, osm()), pch = 21, col = "white", bg = "black", cex = 1.8)
-points(spTransform(plotdataisolateswide, osm()), pch = 23, col = "white", bg = "black", cex = 1.4)
+points(spTransform(plotdataother, osm()), pch = 21, col = "black", bg = "white", cex = 2.4)
+points(spTransform(plotdataisolatesnarrow, osm()), pch = 21, col = "white", bg = "black", cex = 3.8)
+points(spTransform(plotdataisolateswide, osm()), pch = 23, col = "white", bg = "black", cex = 3.4)
+dev.off()
 ```
 
 ## Plots for descriptive statistics
@@ -101,9 +105,9 @@ plot(densityplotmountain)
 
 Create and save panel plot
 ```{r, warning=FALSE}
-densityplotpanel <- ggarrange(densityplotmountain, densityplotsea, ncol = 1, common.legend = TRUE, legend = "bottom", font.label = list(size = 10))
+densityplotpanel <- ggarrange(densityplotmountain, densityplotsea, ncol = 1, common.legend = TRUE, legend = "bottom", labels=c("a", "b"), font.label = list(size = 10))
 densityplotpanel
-ggsave("densityplotpanel.png", densityplotpanel, dpi = 600)
+ggsave("densityplotpanel.pdf", densityplotpanel, dpi = 600)
 ```
 
 ### Boxplots, including by-area plots
@@ -176,9 +180,9 @@ boxplotareamountain
 
 Create and save panel plot
 ```{r}
-boxplotpanel <- ggarrange(boxplothighmountain, boxplotsea, boxplotareamountain, boxplotareasea, ncol = 2, nrow = 2, common.legend = TRUE, legend = "bottom", font.label = list(size = 10))
+boxplotpanel <- ggarrange(boxplothighmountain, boxplotsea, boxplotareamountain, boxplotareasea, ncol = 2, nrow = 2, common.legend = TRUE, legend = "bottom", labels=c("a", "b", "c", "d"),font.label = list(size = 10))
 boxplotpanel
-ggsave("boxplotpanel.png", boxplotpanel, dpi = 600)
+ggsave("boxplotpanel.pdf", boxplotpanel, dpi = 600)
 ```
 
 ## Plot showing the successive removal of landmasses depending on whether or not they feature mountain areas and then on whether or not they feature mountain areas with alpine conditions
@@ -228,7 +232,7 @@ landmasseswithhighmountainsplot
 
 Finally, create and save panel plot
 ```{r}
-landmassespanel <- ggarrange(fulllandmassesplot, landmasseswithmountainsplot, landmasseswithhighmountainsplot, ncol = 1, nrow = 3, common.legend = TRUE, legend = "bottom", font.label = list(size = 10))
+landmassespanel <- ggarrange(fulllandmassesplot, landmasseswithmountainsplot, landmasseswithhighmountainsplot, ncol = 1, nrow = 3, common.legend = TRUE, legend = "bottom", labels=c("a", "b", "c"), font.label = list(size = 10))
 landmassespanel
-ggsave("landmassespanel.png", landmassespanel, dpi = 600)
+ggsave("landmassespanel.pdf", landmassespanel, dpi = 600)
 ```
