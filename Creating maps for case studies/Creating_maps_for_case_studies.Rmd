@@ -123,9 +123,10 @@ Create and save final map
 ggburushaskifull <- ggdraw(ggburushaski) +
   draw_plot(ggburushaskiinset, x = 0.055, y = 0.2, width = 0.27, height = 0.27)
 plot(ggburushaskifull)
-
 ggsave("Burushaski map.pdf", plot = ggburushaskifull, dpi = 600)
 ```
+
+As can be seen, the output map features an artifact that is generated when plotting the shapefile for the Shina language. I have not been able to fix this issue, and have therefore postprocessed the map manually.
 
 # Pomoan
 Read in data

@@ -1,7 +1,7 @@
 Creating maps for case studies of isolate genesis and range reduction
 ================
 Matthias Urban
-15 März, 2021
+16 März, 2021
 
 # Overview
 
@@ -188,6 +188,10 @@ ggsave("Burushaski map.pdf", plot = ggburushaskifull, dpi = 600)
 ```
 
     ## Saving 7 x 5 in image
+
+As can be seen, the output map features an artifact that is generated
+when plotting the shapefile for the Shina language. I have not been able
+to fix this issue, and have therefore postprocessed the map manually.
 
 # Pomoan
 
