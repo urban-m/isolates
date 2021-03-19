@@ -1,7 +1,7 @@
 Creating maps for case studies of isolate genesis and range reduction
 ================
 Matthias Urban
-16 März, 2021
+19 März, 2021
 
 # Overview
 
@@ -9,6 +9,11 @@ On the basis of shapefiles for language ranges created in house on the
 basis of extant specialized literature as cited in the article, this
 document describes the creation of the maps for case studies of the
 genesis of isolates and the reduction of their ranges.
+
+\#Required datasets The document assumes that the shapefiles available
+at
+<https://github.com/urban-m/isolates/tree/main/Creating%20maps%20for%20case%20studies/Shapefiles>
+are stored in a directory named “Data” within the project directory.
 
 # Required packages
 
@@ -30,15 +35,15 @@ map.world <- map_data(map = "world")
 Read in data
 
 ``` r
-basque1stmillenium <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 1st millenium BC.shp"))
-basque7thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 7th century.shp"))
-basque9thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 9th century.shp"))
-basque11thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 11th century.shp"))
-basque13thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 13th century.shp"))
-basque16thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 18th century.shp"))
-basque18thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 18th century.shp"))
-basque19thcentury <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque 19th century.shp"))
-basquetoday <- fortify(readOGR("../Data/Shapefiles/Fig. 2 Basque/Basque today.shp"))
+basque1stmillenium <- fortify(readOGR("../Data/Basque 1st millenium BC.shp"))
+basque7thcentury <- fortify(readOGR("../Data/Basque 7th century.shp"))
+basque9thcentury <- fortify(readOGR("../Data/Basque 9th century.shp"))
+basque11thcentury <- fortify(readOGR("../Data/Basque 11th century.shp"))
+basque13thcentury <- fortify(readOGR("../Data/Basque 13th century.shp"))
+basque16thcentury <- fortify(readOGR("../Data/Basque 18th century.shp"))
+basque18thcentury <- fortify(readOGR("../Data/Basque 18th century.shp"))
+basque19thcentury <- fortify(readOGR("../Data/Basque 19th century.shp"))
+basquetoday <- fortify(readOGR("../Data/Basque today.shp"))
 ```
 
 Create main map
@@ -100,14 +105,14 @@ ggsave("Basque map.pdf", plot = ggbasquefull, dpi = 600)
 
     ## Saving 7 x 5 in image
 
-\#Burushaski
+# Burushaski
 
 Read in data
 
 ``` r
-wakhi <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/wakhi.shp"))
-burushaski <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/burushaski.shp"))
-shina <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/shina.shp"))
+wakhi <- fortify(readOGR("../Data/wakhi.shp"))
+burushaski <- fortify(readOGR("../Data/burushaski.shp"))
+shina <- fortify(readOGR("../Data/shina.shp"))
 ```
 
     ## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS
@@ -125,7 +130,7 @@ shina <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/shina.shp"))
     ## Warning in showSRID(wkt2, "PROJ"): Discarded datum D_unknown in CRS definition
 
 ``` r
-khowar <- fortify(readOGR("../Data/Shapefiles/Fig. 3 Burushaski/khowar.shp"))
+khowar <- fortify(readOGR("../Data/khowar.shp"))
 ```
 
     ## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS
@@ -198,8 +203,8 @@ to fix this issue, and have therefore postprocessed the map manually.
 Read in data
 
 ``` r
-kashaya <- fortify(readOGR("../Data/Shapefiles/Fig. 4 Pomoan/Kashaya.shp"))
-otherpomo <- fortify(readOGR("../Data/Shapefiles/Fig. 4 Pomoan/Other Pomo.shp"))
+kashaya <- fortify(readOGR("../Data/Kashaya.shp"))
+otherpomo <- fortify(readOGR("../Data/Other Pomo.shp"))
 ```
 
 Create main map
@@ -252,11 +257,11 @@ ggsave("Pomo map.pdf", plot = ggpomoanfull, dpi = 600)
 Read in data
 
 ``` r
-celticmaximal <- fortify(readOGR("../Data/Shapefiles/Fig. 5 Celtic/Celtic maximal.shp"))
-gaelic <- fortify(readOGR("../Data/Shapefiles/Fig. 5 Celtic/Gaelic.shp"))
-breton <- fortify(readOGR("../Data/Shapefiles/Fig. 5 Celtic/Breton.shp"))
-irish <- fortify(readOGR("../Data/Shapefiles/Fig. 5 Celtic/Irish.shp"))
-welsh <- fortify(readOGR("../Data/Shapefiles/Fig. 5 Celtic/Welsh.shp"))
+celticmaximal <- fortify(readOGR("../Data/Celtic maximal.shp"))
+gaelic <- fortify(readOGR("../Data/Gaelic.shp"))
+breton <- fortify(readOGR("../Data/Breton.shp"))
+irish <- fortify(readOGR("../Data/Irish.shp"))
+welsh <- fortify(readOGR("../Data/Welsh.shp"))
 ```
 
 Create and save map
