@@ -1,7 +1,7 @@
 Data preparation and selection
 ================
 Matthias Urban
-23 November, 2020
+19 März, 2021
 
 # Overview
 
@@ -16,12 +16,12 @@ languages are spoken is calculated.
 The document assumes that the following files are stored in a directory
 named “Data” within the project directory:
 
-Glottolog 4.2 data (Hammarström et al. 2020) available here:
+Glottolog 4.2 data (Hammarström et al. 2020) available at Zenodo:
 <https://zenodo.org/record/3753877#.X7IoRFAxnOg>
 
-OpenStreetMap land polygon data available here:
-<https://www.dropbox.com/s/t34w7q8q1zgxh20/land_polygons.shp?dl=0> These
-data were originally downloaded from
+OpenStreetMap land polygon data available at Zenodo:
+<https://doi.org/10.5281/zenodo.4621263> These data were originally
+downloaded from
 <https://osmdata.openstreetmap.de/download/land-polygons-complete-4326.zip>,
 but have been superseded in the meantime by more recent versions. The
 site does not retain older versions of the dataset.
@@ -30,8 +30,8 @@ GMBA mountain inventory (Körner et al. 2017) available here:
 <https://ilias.unibe.ch/goto_ilias3_unibe_file_1047348_download.html>
 <https://ilias.unibe.ch/goto_ilias3_unibe_file_1346114_download.html>
 
-Workspace available here:
-<https://www.dropbox.com/s/dz4l8efso4f986k/workspace.RData?dl=0>
+Workspace available here at Zenodo:
+<https://doi.org/10.5281/zenodo.4621263>
 
 Because of a large number of time-consuming calculations, I did not
 rerun all analyses for creating this documentation. Caching was not an
@@ -80,9 +80,6 @@ rob <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m no
 ``` r
 load(file = "../Data/workspace.Rdata")
 ```
-
-    ## Warning: namespace 'rstan' is not available and has been replaced
-    ## by .GlobalEnv when processing object '.__C__Rcpp_stan_fit4model38ac26c9307b_0532c80944564e7f74911472e422cb16'
 
 ## Read in and prepare Glottolog 4.2 language data
 
